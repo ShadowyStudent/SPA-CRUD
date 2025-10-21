@@ -1,5 +1,10 @@
-# Vue 3 + Vite
+# SPA con CRUD de productos y gestión global con Pinia
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Descripción y objetivo
+Desarrollar una Single Page Application (SPA) en **Vue 3** que implemente un **CRUD de productos**, gestionando el estado global mediante **Pinia** y utilizando **Vue Router** para la navegación entre vistas. La aplicación incluye un **carrito de compras** administrado por Pinia y una ruta dedicada al resumen del pedido. El sitio debe publicarse en **GitHub Pages** y presentarse en exposición por equipos; todos los integrantes deben participar.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Datos del estudiante
+- **Nombre:** Miguel Álvarez López  
+- **Grupo:** S5B  
+- **Curso:** Programacion Web  
+- **No. de Control:** 2227001

@@ -1,32 +1,43 @@
 ﻿import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+let counter = 1001
+function genNumericId() { return counter++ }
+
 export const useProductoStore = defineStore('producto', () => {
   const productos = ref([
-    { id: 'p1', nombre: 'Camisa', precio: 20.0, stock: 10, descripcion: 'Algodón' },
-    { id: 'p2', nombre: 'Pantalón', precio: 35.0, stock: 6, descripcion: 'Jeans' },
-    { id: 'p3', nombre: 'Gorra', precio: 12.5, stock: 15, descripcion: 'Unisex' },
-    { id: 'p4', nombre: 'Zapatos', precio: 60.0, stock: 4, descripcion: 'Cuero sintético' },
-    { id: 'p5', nombre: 'Calcetines', precio: 5.0, stock: 30, descripcion: 'Algodón' }
+    { id: genNumericId(), name: 'Lienzo 50x70 cm', short: 'Lienzo preparado para acrílico', price: 250 },
+    { id: genNumericId(), name: 'Set Pinceles 12pz', short: 'Pinceles redondos y planos, sintéticos', price: 120 },
+    { id: genNumericId(), name: 'Óleo Tubo 200ml - Blanco', short: 'Pintura al óleo alta pigmentación', price: 180 },
+    { id: genNumericId(), name: 'Acrílico Tubo 120ml - Prisma', short: 'Acrílico profesional, colores surtidos', price: 95 },
+    { id: genNumericId(), name: 'Paleta de Madera', short: 'Paleta ergonómica para mezcla de colores', price: 40 }
   ])
 
   function crearProducto(producto) {
-    producto.id = producto.id || `p${Date.now()}`
-    productos.value.push(producto)
+    const p = { id: genNumericId(), ...producto }
+    productos.value.push(p)
+    return p
   }
 
-  function actualizarProducto(id, nuevo) {
-    const idx = productos.value.findIndex(p => p.id === id)
-    if (idx !== -1) productos.value[idx] = { ...productos.value[idx], ...nuevo }
+  function actualizarProducto(id, datos) {
+    const i = productos.value.findIndex(p => p.id === Number(id))
+    if (i !== -1) productos.value[i] = { ...productos.value[i], ...datos }
   }
 
   function eliminarProducto(id) {
-    productos.value = productos.value.filter(p => p.id !== id)
+    const i = productos.value.findIndex(p => p.id === Number(id))
+    if (i !== -1) productos.value.splice(i, 1)
   }
 
   function obtenerProductoPorId(id) {
-    return productos.value.find(p => p.id === id)
+    return productos.value.find(p => p.id === Number(id)) || null
   }
 
-  return { productos, crearProducto, actualizarProducto, eliminarProducto, obtenerProductoPorId }
+  function buscarPorIdPartial(query) {
+    if (!query) return productos.value
+    const q = String(query).trim()
+    return productos.value.filter(p => String(p.id).includes(q))
+  }
+
+  return { productos, crearProducto, actualizarProducto, eliminarProducto, obtenerProductoPorId, buscarPorIdPartial }
 })

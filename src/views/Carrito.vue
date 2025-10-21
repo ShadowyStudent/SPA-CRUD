@@ -1,30 +1,55 @@
 ﻿<template>
-  <div class="container">
-    <h1>Carrito</h1>
+  <section class="container py-8">
+    <h1 class="text-2xl font-semibold mb-4">Carrito</h1>
+
     <div v-if="carrito.length">
-      <div v-for="item in carrito" :key="item.id" style="border-bottom:1px solid #eee;padding:8px 0;">
-        <strong>{{ item.nombre }}</strong>
-        <div>Cantidad: {{ item.cantidad }}</div>
-        <div>Subtotal: ${{ (item.precio * item.cantidad).toFixed(2) }}</div>
-        <button @click="eliminar(item.productoId)">Eliminar</button>
+      <ul class="space-y-4">
+        <li v-for="item in carrito" :key="item.id" class="flex items-center justify-between p-3 border rounded">
+          <div>
+            <div class="font-medium">{{ item.name }}</div>
+            <div class="text-sm text-gray-500">ID: <span class="font-mono">{{ item.id }}</span></div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button @click="cambiar(item.id, item.cantidad - 1)" class="px-2 py-1 border rounded">-</button>
+            <input type="number" v-model.number="item.cantidad" @change="onInputChange(item)" class="w-20 p-1 text-center border rounded bg-white" />
+            <button @click="cambiar(item.id, item.cantidad + 1)" class="px-2 py-1 border rounded">+</button>
+            <div class="ml-4 font-medium">{{ (item.price * item.cantidad).toFixed(2) }}$</div>
+            <button @click="eliminar(item.id)" class="ml-3 px-3 py-1 bg-red-600 text-white rounded">Eliminar</button>
+          </div>
+        </li>
+      </ul>
+
+      <div class="mt-6 flex items-center justify-between">
+        <div>Total artículos: {{ totalArticulos }}</div>
+        <div>Total precio: {{ totalPrecio.toFixed(2) }}$</div>
       </div>
-      <p><strong>Total artículos:</strong> {{ totalArticulos }}</p>
-      <p><strong>Total precio:</strong> ${{ totalPrecio.toFixed(2) }}</p>
-      <button @click="vaciar">Vaciar carrito</button>
+
+      <div class="mt-4">
+        <button @click="vaciar" class="px-4 py-2 bg-gray-800 text-white rounded">Vaciar carrito</button>
+      </div>
     </div>
+
     <div v-else>
       <p>El carrito está vacío.</p>
     </div>
-  </div>
+  </section>
 </template>
 
-<script setup>
+<script>
 import { useCarritoStore } from '../stores/useCarritoStore'
-const carritoStore = useCarritoStore()
-const carrito = carritoStore.carrito
-const totalArticulos = carritoStore.totalArticulos
-const totalPrecio = carritoStore.totalPrecio
+import { storeToRefs } from 'pinia'
 
-function eliminar(id) { carritoStore.eliminarDelCarrito(id) }
-function vaciar() { carritoStore.vaciarCarrito() }
+export default {
+  setup() {
+    const carritoStore = useCarritoStore()
+    const { carrito, totalArticulos, totalPrecio } = storeToRefs(carritoStore)
+
+    function cambiar(id, nuevaCantidad) { carritoStore.cambiarCantidad(id, nuevaCantidad) }
+    function eliminar(id) { carritoStore.eliminarDelCarrito(id) }
+    function vaciar() { carritoStore.vaciarCarrito() }
+    function onInputChange(item) { carritoStore.cambiarCantidad(item.id, item.cantidad) }
+
+    return { carrito, totalArticulos, totalPrecio, cambiar, eliminar, vaciar, onInputChange }
+  }
+}
 </script>

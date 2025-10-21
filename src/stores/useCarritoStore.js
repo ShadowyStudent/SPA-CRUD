@@ -1,42 +1,34 @@
 ﻿import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 
 export const useCarritoStore = defineStore('carrito', () => {
   const carrito = ref([])
-  const saved = localStorage.getItem('carrito_v1')
-  if (saved) carrito.value = JSON.parse(saved)
 
-  function guardar() {
-    localStorage.setItem('carrito_v1', JSON.stringify(carrito.value))
+  function agregarAlCarritoCantidad(producto, cantidad = 1) {
+    const id = Number(producto.id)
+    const existente = carrito.value.find(p => p.id === id)
+    if (existente) existente.cantidad += Number(cantidad)
+    else carrito.value.push({ id, name: producto.name, price: Number(producto.price), cantidad: Number(cantidad) })
   }
 
-  function agregarAlCarrito(producto, cantidad = 1) {
-    const item = carrito.value.find(i => i.productoId === producto.id)
-    if (item) item.cantidad += cantidad
-    else carrito.value.push({
-      id: `${producto.id}-${Date.now()}`,
-      productoId: producto.id,
-      nombre: producto.nombre,
-      precio: producto.precio,
-      cantidad
-    })
-    guardar()
+  function agregarAlCarrito(producto) { agregarAlCarritoCantidad(producto, 1) }
+
+  function eliminarDelCarrito(id) {
+    const i = carrito.value.findIndex(p => p.id === Number(id))
+    if (i !== -1) carrito.value.splice(i, 1)
   }
 
-  function eliminarDelCarrito(productoId) {
-    carrito.value = carrito.value.filter(i => i.productoId !== productoId)
-    guardar()
+  function cambiarCantidad(id, nuevaCantidad) {
+    const item = carrito.value.find(p => p.id === Number(id))
+    if (!item) return
+    item.cantidad = Number(nuevaCantidad)
+    if (item.cantidad <= 0) eliminarDelCarrito(id)
   }
 
-  function vaciarCarrito() {
-    carrito.value = []
-    guardar()
-  }
+  function vaciarCarrito() { carrito.value.splice(0, carrito.value.length) }
 
-  const totalArticulos = computed(() => carrito.value.reduce((s, i) => s + i.cantidad, 0))
-  const totalPrecio = computed(() => carrito.value.reduce((s, i) => s + i.precio * i.cantidad, 0))
+  const totalArticulos = computed(() => carrito.value.reduce((s, p) => s + (p.cantidad || 0), 0))
+  const totalPrecio = computed(() => carrito.value.reduce((s, p) => s + (p.price * (p.cantidad || 1)), 0))
 
-  watch(carrito, guardar, { deep: true })
-
-  return { carrito, agregarAlCarrito, eliminarDelCarrito, vaciarCarrito, totalArticulos, totalPrecio }
+  return { carrito, agregarAlCarrito, agregarAlCarritoCantidad, eliminarDelCarrito, cambiarCantidad, vaciarCarrito, totalArticulos, totalPrecio }
 })
