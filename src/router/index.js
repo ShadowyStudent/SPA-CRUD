@@ -13,7 +13,4 @@ const routes = [
   { path: '/carrito', name: 'Carrito', component: Carrito }
 ]
 
-export default createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes
-})
+export default createRouter({ history: createWebHistory(), routes })
